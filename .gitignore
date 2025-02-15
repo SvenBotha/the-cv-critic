@@ -1,0 +1,4 @@
+/.venv
+the_cv_critic/__pycache__
+*.pyc
+*.pyo

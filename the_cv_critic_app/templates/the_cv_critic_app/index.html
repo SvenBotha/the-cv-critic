@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CV Scorer</title>
+</head>
+<body>
+    <h1>CV Scorer</h1>
+    <form id="cvForm" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.cv.label_tag }} {{ form.cv }}
+        <button type="submit">Upload</button>
+    </form>
+
+    <div id="results" style="display:none;">
+        <h2>Results</h2>
+        <p>Score: <span id="score"></span></p>
+        <h3>Recommendations:</h3>
+        <ul id="recommendations"></ul>
+    </div>
+
+    <script>
+        document.getElementById('cvForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const formData = new FormData(this);
+
+            fetch('', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert(data.error);
+                } else {
+                    document.getElementById('score').textContent = data.score;
+                    const recommendationsList = document.getElementById('recommendations');
+                    recommendationsList.innerHTML = '';
+                    data.recommendations.forEach(rec => {
+                        const li = document.createElement('li');
+                        li.textContent = rec;
+                        recommendationsList.appendChild(li);
+                    });
+                    document.getElementById('results').style.display = 'block';
+                }
+            })
+            .catch(error => {
+                alert("An error occurred: " + error);
+            });
+        });
+    </script>
+</body>
+</html>
