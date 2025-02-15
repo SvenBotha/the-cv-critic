@@ -1,56 +1,56 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>CV Scorer</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The CV Critic</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
 </head>
 <body>
-    <h1>CV Scorer</h1>
-    <form id="cvForm" method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        {{ form.cv.label_tag }} {{ form.cv }}
-        <button type="submit">Upload</button>
-    </form>
+    <div class="container">
+        <header>
+            <h1>The CV Critic</h1>
+            <p>Crafting Resumes That Get Noticed</p>
+        </header>
 
-    <div id="results" style="display:none;">
-        <h2>Results</h2>
-        <p>Score: <span id="score"></span></p>
-        <h3>Recommendations:</h3>
-        <ul id="recommendations"></ul>
+        <main>
+            <section class="upload-section">
+                <h2>Upload Your CV</h2>
+                <form id="cvForm" method="post" enctype="multipart/form-data" class="cv-form">
+                    {% csrf_token %}
+                    <div class="form-group" style="margin-top: 10px;">
+                        <!-- Hidden file input -->
+                        <input type="file" id="cv" name="cv" class="file-input" style="display:none;" onchange="updateFileName()" accept=".pdf,application/pdf">
+                        
+                        <!-- Custom button to trigger file input -->
+                         
+                        <button type="button" class="custom-upload-button" onclick="document.getElementById('cv').click();">Choose File</button>
+                        
+                        <!-- Display the selected file name -->
+                        <span id="file-name">No file chosen</span>
+                    </div>
+
+                    <div class="upload-btn-container">
+                        <button type="submit" class="submit-button">Upload</button>
+                        <div id="spinner" class="spinner" style="display:none;"></div>
+                    </div>
+                </form>
+            </section>      
+
+            <section id="results" class="results" style="display:none;">
+                <h2>Results</h2>
+                <p><strong>Score:</strong> <span id="score"></span></p>
+                <h3>Recommendations:</h3>
+                <div id="recommendations" class="recommendations-list"></div>
+            </section>
+        </main>
+
+        <footer>
+            <p>&copy; 2025 The CV Critic. All rights reserved.</p>
+        </footer>
     </div>
 
-    <script>
-        document.getElementById('cvForm').addEventListener('submit', function(event) {
-            event.preventDefault();
-
-            const formData = new FormData(this);
-
-            fetch('', {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.error) {
-                    alert(data.error);
-                } else {
-                    document.getElementById('score').textContent = data.score;
-                    const recommendationsList = document.getElementById('recommendations');
-                    recommendationsList.innerHTML = '';
-                    data.recommendations.forEach(rec => {
-                        const li = document.createElement('li');
-                        li.textContent = rec;
-                        recommendationsList.appendChild(li);
-                    });
-                    document.getElementById('results').style.display = 'block';
-                }
-            })
-            .catch(error => {
-                alert("An error occurred: " + error);
-            });
-        });
-    </script>
+    <script src="{% static 'js/script.js' %}"></script>
 </body>
 </html>
