@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The CV Critic</title>
     {% load static %}
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}?v={{ timestamp }}">
 </head>
 <body>
     <div class="container">
@@ -33,7 +33,9 @@
 
                     <div class="upload-btn-container">
                         <button type="submit" class="submit-button">Upload</button>
-                        <div id="spinner" class="spinner" style="display:none;"></div>
+                        <div id="spinner-container" class="spinner-container">
+                            <div id="spinner" class="spinner"></div>
+                        </div>
                     </div>
                 </form>
             </section>      
