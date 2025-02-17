@@ -1,12 +1,12 @@
 # The CV Critic
 Crafting Resumes That Get Noticed
 
-## About
+### About
 The CV Critic is a Django web application that utilizes the OpenAI API to generate a rating and provide recommendations for improving a CV.
 
 # Getting started
 
-## Prerequisites
+### Prerequisites
 Before deploying this application, ensure you have the following installed:
 
 - **Python 3.10+**  
