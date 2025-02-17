@@ -1,18 +1,18 @@
 /* Define CSS Variables for Colors */
 :root {
-    --primary-color: #4CAF50;  /* Green */
-    --primary-hover-color: #45a049;  /* Darker Green */
-    --secondary-color: #007bff;  /* Blue */
-    --secondary-hover-color: #0056b3;  /* Darker Blue */
-    --text-color: #333;  /* Dark Text */
-    --background-color: #f9f9f9;  /* Light Background */
-    --container-background: #fff;  /* White Background for Containers */
-    --result-background: #fff;  /* White Background for Results */
-    --recommendation-background: #f1f1f1;  /* Light Gray for Recommendations */
-    --recommendation-hover-background: #e0e0e0;  /* Slightly Darker Gray on Hover */
-    --footer-text-color: #777;  /* Light Gray for Footer Text */
-    --file-input-border-color: #ccc;  /* Light Border for File Input */
-    --file-name-color: #555;  /* Gray color for file name text */
+    --primary-color: #4CAF50;
+    --primary-hover-color: #45a049;
+    --secondary-color: #007bff;
+    --secondary-hover-color: #0056b3;
+    --text-color: #333;
+    --background-color: #f9f9f9;
+    --container-background: #fff;
+    --result-background: #fff;
+    --recommendation-background: #f1f1f1;
+    --recommendation-hover-background: #e0e0e0;
+    --footer-text-color: #777;
+    --file-name-color: #555;
+    --spinner-border: #f3f3f3;
 }
 
 /* Global Styles */
@@ -121,7 +121,6 @@ header p {
     background-color: var(--recommendation-hover-background);
 }
 
-/* Footer */
 footer {
     text-align: center;
     margin-top: 40px;
@@ -129,13 +128,12 @@ footer {
     color: var(--footer-text-color);
 }
 
-/* Hide the default file input */
+/* File Upload Styles */
 .file-input {
     display: none;
     margin-top: 5px;
 }
 
-/* Custom button style for file upload */
 .custom-upload-button {
     background-color: var(--secondary-color);
     color: white;
@@ -144,63 +142,58 @@ footer {
     border-radius: 4px;
     cursor: pointer;
     font-size: 14px;
-    margin-right: 10px; /* Space between button and file name */
+    margin-right: 10px;
 }
 
 .custom-upload-button:hover {
     background-color: var(--secondary-hover-color);
 }
 
-/* File name display style */
 #file-name {
     font-size: 14px;
     color: var(--file-name-color);
 }
 
-
-/* Container holds both button and spinner */
 .upload-btn-container {
     display: flex;
     align-items: center;
     width: 100%;
-    transition: width 0.5s ease; /* Smooth width change */
-    overflow: hidden; /* Hide content when shrinking */
+    transition: width 0.5s ease; 
+    overflow: hidden;
 }
 
 .spinner-container {
-    display: none; /* Initially hidden */
+    display: none; 
     margin-left: 10px;
-    opacity: 0; /* Initially invisible */
-    transition: opacity 0.3s ease-in-out, margin-left 0.3s ease; /* Smooth transition for opacity and movement */
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out, margin-left 0.3s ease; 
 }
 
 .spinner {
-    border: 4px solid #f3f3f3; /* Light background */
-    border-top: 4px solid var(--primary-color); /* Green color for spinner */
+    border: 4px solid var(--spinner-border);
+    border-top: 4px solid var(--primary-color); 
     border-radius: 50%;
     width: 30px;
     height: 30px;
     animation: spin 1s linear infinite;
 }
 
-/* Spinner animation */
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
 
-/* Shrink button and move spinner left */
 .submit-button.shrink {
     flex-grow: 0;
     width: 0;
 }
 
 .submit-button.hidden {
-    display: none; /* Hide the button */
+    display: none;
 }
 .spinner-container.show {
-    display: block; /* Show the spinner */
+    display: block;
     opacity: 1;
-    margin-left: 0; /* Align spinner to the left */
+    margin-left: 0;
 }
 

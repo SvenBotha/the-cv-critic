@@ -1,14 +1,33 @@
+"""
+views.py
 
-from django.shortcuts import render, redirect
-from django.http import JsonResponse
+This module contains the views for the CV Critic application. It handles the uploading and processing of CVs,
+including converting PDF files to text and using the OpenAI API to review and provide feedback on the CVs.
+
+Functions:
+    convert_pdf_to_text(pdf_path): Converts a PDF file to text using ConvertAPI.
+    process_cv(text): Processes the text of a CV using the OpenAI assistant.
+    upload_cv(request): Handles the CV upload request, converts the PDF to text, and processes the CV text.
+
+Author: Sven Botha
+Date: 17 February 2025
+"""
+
 from .forms import CVUploadForm 
+from django.http import JsonResponse
+from django.shortcuts import render, redirect
 
 import os
+import re
 import json
-import openai
-import convertapi
-import tempfile
 import time
+import openai
+import logging
+import tempfile
+import convertapi
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
 
 # Initialize OpenAI client
 client = openai.OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
@@ -20,15 +39,21 @@ try:
         model="gpt-4-turbo-preview",
         tools=[{"type": "file_search"}],
     )
-    print(f"Assistant created successfully with ID: {assistant.id}")
+    logging.info(f"Assistant created successfully with ID: {assistant.id}")
 except Exception as e:
-    print(f"Error initializing OpenAI Assistant: {e}")
-    assistant = None  # If creation fails, set assistant to None
+    try:
+        error_data = e.response.json()
+        error_code = error_data.get('error', {}).get('code')
+        error_message = "Error code: " + error_code + "\n" + error_data.get('error', {}).get('message')
+    except AttributeError:
+        error_message = str(e)
+
+    logging.error("Error initializing OpenAI Assistant:")
+    logging.error(error_message)
+
+    assistant = None
 
 convertapi.api_key = os.getenv("CONVERTAPI_API_KEY")
-import convertapi
-import os
-import tempfile
 
 def convert_pdf_to_text(pdf_path):
     convertapi.api_credentials = os.environ.get('CONVERTAPI_API_KEY')
@@ -39,7 +64,7 @@ def convert_pdf_to_text(pdf_path):
 
         # Create a temporary file to store the output
         with tempfile.NamedTemporaryFile(delete=False, suffix=".txt") as temp_file:
-            output_file = temp_file.name  # Store the path of the temp file
+            output_file = temp_file.name
 
         # Save the converted file to the temp location
         result.save_files(output_file)
@@ -56,17 +81,21 @@ def convert_pdf_to_text(pdf_path):
     except Exception as e:
         return f"Error converting PDF: {e}"
 
-
 def process_cv(text):
     if assistant is None:
         return 0, ["Error: Could not create/retrieve OpenAI assistant."]
     try:
+        # Create an openai thread
         thread = client.beta.threads.create()
+
+        # Send the CV text to the assistant
         client.beta.threads.messages.create(
             thread_id=thread.id,
             role="user",
             content=text,
         )
+
+        # Run the assistant
         run = client.beta.threads.runs.create(
             thread_id=thread.id,
             assistant_id=assistant.id,
@@ -82,24 +111,22 @@ def process_cv(text):
                 break
             elif run.status == "failed":
                 return 0, ["Error: Assistant failed to process CV"]
-            time.sleep(1)  # Avoid excessive API calls
+            time.sleep(1) 
         
+        # Retrieve the assistant's response
         messages = client.beta.threads.messages.list(thread_id=thread.id)
         assistant_response = next((msg.content[0].text.value for msg in messages.data if msg.role == "assistant"), "")
-        # Debugging: Print raw assistant response
-        print("Raw Assistant Response:", assistant_response)
-
-        import re
 
         # Extract only the JSON content
         if assistant_response.startswith("```json") and assistant_response.endswith("```"):
             assistant_response = re.sub(r"```json|```", "", assistant_response).strip()
 
         # Debugging: Print the cleaned-up response
-        print("Cleaned Assistant Response:", assistant_response)
+        logging.debug("Cleaned Assistant Response:", assistant_response)
 
+        # Parse the JSON response
         try:
-            data = json.loads(assistant_response)  # Ensure it's valid JSON
+            data = json.loads(assistant_response) 
             score = data.get('score', 0)
             recommendations = data.get('recommendations', [])
 
@@ -113,21 +140,28 @@ def process_cv(text):
         return 0, [f"Error processing CV: {e}"]
 
 def upload_cv(request):
+    # Process the uploaded CV
     if request.method == 'POST':
+        # Validate the uploaded file
         form = CVUploadForm(request.POST, request.FILES)
         if form.is_valid():
+            # Save the uploaded file to a temporary location
             cv_file = request.FILES['cv']
             with tempfile.NamedTemporaryFile(delete=False, suffix='.pdf') as temp_file:
                 for chunk in cv_file.chunks():
                     temp_file.write(chunk)
                 pdf_path = temp_file.name
             
+            # Convert the PDF to text
             text = convert_pdf_to_text(pdf_path)
+
+            # Clean up the temporary file
             os.remove(pdf_path)
             
             if "Error converting PDF" in text:
                 return JsonResponse({'error': text})
             
+            # Process the CV text using openai assistant
             score, recommendations = process_cv(text)
             return JsonResponse({'score': score, 'recommendations': recommendations})
         else:

@@ -3,3 +3,4 @@ the_cv_critic/__pycache__
 the_cv_critic/migrations/__pycache__
 *.pyc
 *.pyo
+.env

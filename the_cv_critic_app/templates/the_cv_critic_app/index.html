@@ -20,14 +20,8 @@
                 <form id="cvForm" method="post" enctype="multipart/form-data" class="cv-form">
                     {% csrf_token %}
                     <div class="form-group" style="margin-top: 10px;">
-                        <!-- Hidden file input -->
                         <input type="file" id="cv" name="cv" class="file-input" style="display:none;" onchange="updateFileName()" accept=".pdf,application/pdf">
-                        
-                        <!-- Custom button to trigger file input -->
-                         
                         <button type="button" class="custom-upload-button" onclick="document.getElementById('cv').click();">Choose File</button>
-                        
-                        <!-- Display the selected file name -->
                         <span id="file-name">No file chosen</span>
                     </div>
 
