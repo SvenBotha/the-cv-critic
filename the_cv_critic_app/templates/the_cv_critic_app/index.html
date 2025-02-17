@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The CV Critic</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}?v={{ timestamp }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>The CV Critic</h1>
+            <p>Crafting Resumes That Get Noticed</p>
+        </header>
+
+        <main>
+            <section class="upload-section">
+                <h2>Upload Your CV</h2>
+                <form id="cvForm" method="post" enctype="multipart/form-data" class="cv-form">
+                    {% csrf_token %}
+                    <div class="form-group" style="margin-top: 10px;">
+                        <input type="file" id="cv" name="cv" class="file-input" style="display:none;" onchange="updateFileName()" accept=".pdf,application/pdf">
+                        <button type="button" class="custom-upload-button" onclick="document.getElementById('cv').click();">Choose File</button>
+                        <span id="file-name">No file chosen</span>
+                    </div>
+
+                    <div class="upload-btn-container">
+                        <button type="submit" class="submit-button">Upload</button>
+                        <div id="spinner-container" class="spinner-container">
+                            <div id="spinner" class="spinner"></div>
+                        </div>
+                    </div>
+                </form>
+            </section>      
+
+            <section id="results" class="results" style="display:none;">
+                <h2>Results</h2>
+                <p><strong>Score:</strong> <span id="score"></span></p>
+                <h3>Recommendations:</h3>
+                <div id="recommendations" class="recommendations-list"></div>
+            </section>
+        </main>
+
+        <footer>
+            <p>&copy; 2025 The CV Critic. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script src="{% static 'js/script.js' %}"></script>
+</body>
+</html>
